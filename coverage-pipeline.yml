@@ -15,13 +15,14 @@ stages:
     steps:
     - task: SonarQubePrepare@7
       inputs:
-        SonarQube: 'SonarQube-Server-01'
+        SonarQube: 'sonarqube-integrate'
         scannerMode: 'dotnet'
         projectKey: 'codecoverage.net'
-        extraProperties: |
-          sonar.sources=$(Build.SourcesDirectory)/src
-          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml 
-          sonar.verbose=true
+        projectName: 'deploy'
+        # extraProperties: |
+        #   sonar.sources=$(Build.SourcesDirectory)/src
+        #   sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml 
+        #   sonar.verbose=true
     # Step 1: Restore Dependencies
     - script: dotnet restore
       displayName: 'Restore Dependencies'
