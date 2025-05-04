@@ -1,0 +1,11 @@
+@model CRUD.Models.Product
+
+<h2>Create Product</h2>
+
+<form asp-action="Create" method="post">
+    <label>Name:</label>
+    <input asp-for="Name" />
+    <label>Price:</label>
+    <input asp-for="Price" />
+    <button type="submit">Save</button>
+</form>
