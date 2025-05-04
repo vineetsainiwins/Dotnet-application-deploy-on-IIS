@@ -1,10 +1,8 @@
 trigger:
-  branches:
-    include:
-      - main
+      - none
 
 pool:
-  name: self-hosted-agent
+  name: test agent
 
 variables:
   BuildConfiguration: 'Debug'
@@ -19,7 +17,7 @@ stages:
       inputs:
         SonarQube: 'SonarQube-Server-01'
         scannerMode: 'dotnet'
-        projectKey: 'ASP.Net-CRUD_ASP.Net-CRUD_AZaQSKWoVVAn5azlFYcz'
+        projectKey: 'codecoverage.net'
         extraProperties: |
           sonar.sources=$(Build.SourcesDirectory)/src
           sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml 
