@@ -8,21 +8,21 @@ variables:
   BuildConfiguration: 'Debug'
 
 stages:
-# Stage 1: Build, Test, and Generate Coverage
 - stage: Build_Test_Coverage
   displayName: Build, Test, and Generate Coverage
   jobs:
   - job: BuildAndTest
     displayName: Build and Run Unit Tests
     steps:
-    # Step 1: Prepare SonarQube Analysis (MSBuild mode for .NET)
+    # Step 1: Prepare SonarQube Analysis (dotnet scanner mode)
     - task: SonarQubePrepare@7
       inputs:
-        SonarQube: 'sonarqube-integrate'  # Service connection name
-        scannerMode: 'MSBuild'
+        SonarQube: 'sonarqube-integrate'  # Your service connection
+        scannerMode: 'dotnet'
         projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
         projectName: 'deploy'
         extraProperties: |
+          sonar.sources=$(Build.SourcesDirectory)/src
           sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml
           sonar.verbose=true
 
@@ -30,11 +30,11 @@ stages:
     - script: dotnet restore
       displayName: 'Restore Dependencies'
 
-    # Step 3: Build the project
+    # Step 3: Build the Project
     - script: dotnet build CRUD.csproj --configuration $(BuildConfiguration)
       displayName: 'Build Project'
 
-    # Step 4: Run Unit Tests with Code Coverage
+    # Step 4: Run Unit Tests
     - script: |
         dotnet test CRUD.csproj \
           --no-build \
@@ -43,7 +43,7 @@ stages:
           --results-directory ./TestResults
       displayName: 'Run Tests with Coverage'
 
-    # Step 5: Convert Coverage to OpenCover format
+    # Step 5: Convert Coverage to OpenCover Format
     - script: |
         dotnet tool install -g coverlet.console || true
         export PATH="$PATH:~/.dotnet/tools"
@@ -66,7 +66,7 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-    # Step 8: Publish Coverage Report Artifact
+    # Step 8: Publish Code Coverage Report
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: 'TestResults'
@@ -74,7 +74,7 @@ stages:
         publishLocation: 'Container'
       displayName: 'Publish Coverage Report'
 
-# Stage 2: Docker Build and Run
+# Stage 2: Docker Compose Deployment
 - stage: Docker_Build_Run
   dependsOn: Build_Test_Coverage
   condition: succeeded()
