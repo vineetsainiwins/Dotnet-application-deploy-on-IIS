@@ -1,45 +1,49 @@
 trigger:
-      - none
+  - none
 
 pool:
   name: test agent
 
 variables:
   BuildConfiguration: 'Debug'
-# Stage 1: Build, Test, and Generate Coverage 
+
 stages:
+# Stage 1: Build, Test, and Generate Coverage
 - stage: Build_Test_Coverage
   displayName: Build, Test, and Generate Coverage
   jobs:
   - job: BuildAndTest
+    displayName: Build and Run Unit Tests
     steps:
+    # Step 1: Prepare SonarQube Analysis (MSBuild mode for .NET)
     - task: SonarQubePrepare@7
       inputs:
-        SonarQube: 'sonarqube-integrate'
-        scannerMode: 'dotnet'
+        SonarQube: 'sonarqube-integrate'  # Service connection name
+        scannerMode: 'MSBuild'
         projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
         projectName: 'deploy'
         extraProperties: |
-          sonar.sources=$(Build.SourcesDirectory)/src
-          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml 
+          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml
           sonar.verbose=true
-    # Step 1: Restore Dependencies
+
+    # Step 2: Restore Dependencies
     - script: dotnet restore
       displayName: 'Restore Dependencies'
-    # Step 2: Run Unit Tests with Coverage
+
+    # Step 3: Build the project
+    - script: dotnet build CRUD.csproj --configuration $(BuildConfiguration)
+      displayName: 'Build Project'
+
+    # Step 4: Run Unit Tests with Code Coverage
     - script: |
         dotnet test CRUD.csproj \
-          --no-restore \
+          --no-build \
           --collect:"XPlat Code Coverage" \
           --logger:"trx;LogFileName=TestResults.trx" \
           --results-directory ./TestResults
       displayName: 'Run Tests with Coverage'
-    # Step4: Run Tests with Code Coverage
-    - script: |
-        dotnet test --collect:"Code Coverage" --results-directory TestResults
-      displayName: 'Run Tests with Code Coverage'
-      continueOnError: true  # Proceed even if tests fail
-    # Step5: Convert Coverage File to opencover Format
+
+    # Step 5: Convert Coverage to OpenCover format
     - script: |
         dotnet tool install -g coverlet.console || true
         export PATH="$PATH:~/.dotnet/tools"
@@ -50,39 +54,35 @@ stages:
           --include-test-assembly \
           --format opencover \
           --output ./TestResults/coverage.opencover.xml || true
-      displayName: 'Convert Coverage to Cobertura, opencover Format'
-    # Step: Generate Coverage Report
-    # - script: |
-    #     # export PATH="$PATH:~/.dotnet/tools"
-    #     reportgenerator \
-    #       -reports:"TestResults/coverage.opencover.xml" \
-    #       -targetdir:"coveragereport" \
-    #       -reporttypes:"HtmlInline_AzurePipelines;opencover"
-    #   displayName: 'Generate Code Coverage Report' 
-    # Step 8: Perform SonarCloud Analysis
+      displayName: 'Convert Coverage to OpenCover Format'
+
+    # Step 6: Run SonarQube Analysis
     - task: SonarQubeAnalyze@7
       inputs:
         jdkversion: 'JAVA_HOME_17_X64'
 
+    # Step 7: Publish SonarQube Results
     - task: SonarQubePublish@7
       inputs:
         pollingTimeoutSec: '300'
-    # Step 10: Publish Code Coverage Report as a Build Artifact
+
+    # Step 8: Publish Coverage Report Artifact
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: 'TestResults'
         ArtifactName: 'CodeCoverageReport'
         publishLocation: 'Container'
       displayName: 'Publish Coverage Report'
-# Stage 2: Build and Run the Application using Docker   
+
+# Stage 2: Docker Build and Run
 - stage: Docker_Build_Run
   dependsOn: Build_Test_Coverage
   condition: succeeded()
   jobs:
   - job: DockerComposeBuild
+    displayName: Build and Run Docker Compose App
     steps:
     - script: |
         docker-compose down
         docker-compose up -d --build
       displayName: 'Build and Run App using Docker Compose'
-
