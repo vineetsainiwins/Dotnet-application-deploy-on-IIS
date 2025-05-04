@@ -17,7 +17,7 @@ stages:
       inputs:
         SonarQube: 'sonarqube-integrate'
         scannerMode: 'dotnet'
-        projectKey: 'codecoverage.net'
+        projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
         projectName: 'deploy'
         extraProperties: |
           sonar.sources=$(Build.SourcesDirectory)/src
