@@ -14,17 +14,19 @@ stages:
   - job: BuildAndTest
     displayName: Build and Run Unit Tests
     steps:
+
     # Step 1: Prepare SonarQube Analysis (dotnet scanner mode)
     - task: SonarQubePrepare@7
       inputs:
-       SonarQube: 'sonarqube-integrate'
-       scannerMode: 'dotnet'
-       projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
-       projectName: 'deploy'
-       extraProperties: |
-        sonar.login=sqa_72bffb3fb0b344677067d9790c094659388586e5
-        sonar.sources=$(Build.SourcesDirectory)/src
-        sonar.verbose=true
+        SonarQube: 'sonarqube-integrate'
+        scannerMode: 'dotnet'
+        projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
+        projectName: 'deploy'
+        extraProperties: |
+          sonar.login=sqa_72bffb3fb0b344677067d9790c094659388586e5
+          sonar.sources=$(Build.SourcesDirectory)/src
+          sonar.verbose=true
+          sonar.coverageReportPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml
 
     # Step 2: Restore Dependencies
     - script: dotnet restore
@@ -34,13 +36,13 @@ stages:
     - script: dotnet build CRUD.csproj --configuration $(BuildConfiguration)
       displayName: 'Build Project'
 
-    # Step 4: Run Unit Tests
+    # Step 4: Run Unit Tests with Coverage
     - script: |
         dotnet test CRUD.csproj \
           --no-build \
           --collect:"XPlat Code Coverage" \
           --logger:"trx;LogFileName=TestResults.trx" \
-          --results-directory ./TestResults
+          --results-directory $(Build.SourcesDirectory)/TestResults
       displayName: 'Run Tests with Coverage'
 
     # Step 5: Convert Coverage to OpenCover Format
@@ -53,7 +55,7 @@ stages:
           --include "[CRUD]*" \
           --include-test-assembly \
           --format opencover \
-          --output ./TestResults/coverage.opencover.xml || true
+          --output $(Build.SourcesDirectory)/TestResults/coverage.opencover.xml || true
       displayName: 'Convert Coverage to OpenCover Format'
 
     # Step 6: Run SonarQube Analysis
@@ -66,10 +68,10 @@ stages:
       inputs:
         pollingTimeoutSec: '300'
 
-    # Step 8: Publish Code Coverage Report
+    # Step 8: Publish Code Coverage Report as Artifact
     - task: PublishBuildArtifacts@1
       inputs:
-        PathtoPublish: 'TestResults'
+        PathtoPublish: '$(Build.SourcesDirectory)/TestResults'
         ArtifactName: 'CodeCoverageReport'
         publishLocation: 'Container'
       displayName: 'Publish Coverage Report'
