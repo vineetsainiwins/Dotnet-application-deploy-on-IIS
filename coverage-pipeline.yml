@@ -73,16 +73,3 @@ stages:
         ArtifactName: 'CodeCoverageReport'
         publishLocation: 'Container'
       displayName: 'Publish Coverage Report'
-
-# Stage 2: Docker Compose Deployment
-- stage: Docker_Build_Run
-  dependsOn: Build_Test_Coverage
-  condition: succeeded()
-  jobs:
-  - job: DockerComposeBuild
-    displayName: Build and Run Docker Compose App
-    steps:
-    - script: |
-        docker-compose down
-        docker-compose up -d --build
-      displayName: 'Build and Run App using Docker Compose'
