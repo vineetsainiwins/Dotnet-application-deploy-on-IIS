@@ -17,14 +17,14 @@ stages:
     # Step 1: Prepare SonarQube Analysis (dotnet scanner mode)
     - task: SonarQubePrepare@7
       inputs:
-        SonarQube: 'sonarqube-integrate'  # Your service connection
-        scannerMode: 'dotnet'
-        projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
-        projectName: 'deploy'
-        extraProperties: |
-          sonar.sources=$(Build.SourcesDirectory)/src
-          sonar.cs.opencover.reportsPaths=$(Build.SourcesDirectory)/TestResults/coverage.opencover.xml
-          sonar.verbose=true
+       SonarQube: 'sonarqube-integrate'
+       scannerMode: 'dotnet'
+       projectKey: 'deploy_dotnet_b05fe8b9-f022-47d0-bdd9-2e722d63a2c3'
+       projectName: 'deploy'
+       extraProperties: |
+        sonar.login=sqa_72bffb3fb0b344677067d9790c094659388586e5
+        sonar.sources=$(Build.SourcesDirectory)/src
+        sonar.verbose=true
 
     # Step 2: Restore Dependencies
     - script: dotnet restore
