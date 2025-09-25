@@ -1643,24 +1643,25 @@
     ]
   },
   "packageFolders": {
-    "/home/deepam-dits/.nuget/packages/": {}
+    "C:\\Users\\Dinesh\\.nuget\\packages\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/mnt/c/ADO-projects/ASP.Net-core-8/CRUD/CRUD.csproj",
+      "projectUniqueName": "C:\\Users\\Dinesh\\OneDrive\\Documents\\dotnet\\CRUD.csproj",
       "projectName": "CRUD",
-      "projectPath": "/mnt/c/ADO-projects/ASP.Net-core-8/CRUD/CRUD.csproj",
-      "packagesPath": "/home/deepam-dits/.nuget/packages/",
-      "outputPath": "/mnt/c/ADO-projects/ASP.Net-core-8/CRUD/obj/",
+      "projectPath": "C:\\Users\\Dinesh\\OneDrive\\Documents\\dotnet\\CRUD.csproj",
+      "packagesPath": "C:\\Users\\Dinesh\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Dinesh\\OneDrive\\Documents\\dotnet\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/deepam-dits/.nuget/NuGet/NuGet.Config"
+        "C:\\Users\\Dinesh\\AppData\\Roaming\\NuGet\\NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1673,7 +1674,13 @@
         "warnAsError": [
           "NU1605"
         ]
-      }
+      },
+      "restoreAuditProperties": {
+        "enableAudit": "true",
+        "auditLevel": "low",
+        "auditMode": "direct"
+      },
+      "SdkAnalysisLevel": "9.0.200"
     },
     "frameworks": {
       "net8.0": {
@@ -1725,6 +1732,24 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.win-x64",
+            "version": "[8.0.15, 8.0.15]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          },
+          {
+            "name": "Microsoft.WindowsDesktop.App.Ref",
+            "version": "[8.0.15, 8.0.15]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -1733,7 +1758,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib/dotnet/sdk/8.0.115/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.203/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
