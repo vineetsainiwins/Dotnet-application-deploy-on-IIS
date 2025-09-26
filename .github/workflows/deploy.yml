@@ -11,7 +11,43 @@ jobs:
 
     steps:
       - name: Checkout Code
+        uses: actions/checkout@v4name: .NET IIS Deployment
+
+on:
+  push:
+    branches:
+      - main   # adjust branch as needed
+
+jobs:
+  build-and-deploy:
+    runs-on: self-hosted   # 👈 your IIS runner
+
+    steps:
+      - name: Checkout Code
         uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 7.0.x   # match your app’s SDK version
+
+      - name: Restore Dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Publish
+        run: dotnet publish -c Release -o ./publish
+
+      - name: Deploy to IIS
+        run: |
+          echo "Deploying to IIS..."
+          # Remove old files (optional, keep if you want a clean deploy)
+          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet" || echo "No existing site folder"
+          # Copy new files
+          Copy-Item -Recurse -Force "./publish/*" "C:\inetpub\wwwroot\dotnet"
+
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
