@@ -28,18 +28,25 @@ jobs:
           echo "Deploying to IIS..."
           Import-Module WebAdministration
 
-          # Stop AppPool
-          Stop-WebAppPool -Name "DefaultAppPool"
+          # Check AppPool status before stopping
+          $pool = Get-WebAppPoolState "DefaultAppPool"
+          if ($pool.Value -eq "Started") {
+              Stop-WebAppPool -Name "DefaultAppPool"
+          }
 
-          # Ensure folder exists
+          # Remove old files
           if (Test-Path "C:\inetpub\wwwroot\dotnet") {
               Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet"
           }
           New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\dotnet" -Force
 
-          # Copy published files into IIS site folder
+          # Deploy new build
           Copy-Item -Path "./publish/*" -Destination "C:\inetpub\wwwroot\dotnet\" -Recurse -Force
 
-          # Start AppPool
-          Start-WebAppPool -Name "DefaultAppPool"
+          # Start AppPool if not started
+          $pool = Get-WebAppPoolState "DefaultAppPool"
+          if ($pool.Value -ne "Started") {
+              Start-WebAppPool -Name "DefaultAppPool"
+          }
+
 
