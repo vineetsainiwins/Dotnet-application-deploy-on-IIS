@@ -3,24 +3,11 @@ name: .NET IIS Deployment
 on:
   push:
     branches:
-      - main
+      - main   # adjust branch if needed
 
 jobs:
   build-and-deploy:
-    runs-on: self-hosted   # instead of windows-latest
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4name: .NET IIS Deployment
-
-on:
-  push:
-    branches:
-      - main   # adjust branch as needed
-
-jobs:
-  build-and-deploy:
-    runs-on: self-hosted   # 👈 your IIS runner
+    runs-on: self-hosted   # your IIS runner
 
     steps:
       - name: Checkout Code
@@ -43,26 +30,5 @@ jobs:
       - name: Deploy to IIS
         run: |
           echo "Deploying to IIS..."
-          # Remove old files (optional, keep if you want a clean deploy)
-          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet" || echo "No existing site folder"
-          # Copy new files
+          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet" -ErrorAction Ignore
           Copy-Item -Recurse -Force "./publish/*" "C:\inetpub\wwwroot\dotnet"
-
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 7.0.x
-
-      - name: Restore Dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build --configuration Release
-
-      - name: Publish
-        run: dotnet publish -c Release -o publish
-
-      - name: Deploy to IIS (local copy)
-        run: |
-          Copy-Item -Path publish\* -Destination "C:\inetpub\wwwroot\dotnet" -Recurse -Force
