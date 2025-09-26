@@ -23,7 +23,7 @@ jobs:
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to IIS
-        shell: pwsh
+        shell: powershell
         run: |
           echo "Deploying to IIS..."
           Import-Module WebAdministration
@@ -42,3 +42,4 @@ jobs:
 
           # Start AppPool
           Start-WebAppPool -Name "DefaultAppPool"
+
