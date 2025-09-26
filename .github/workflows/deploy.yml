@@ -23,11 +23,22 @@ jobs:
         run: dotnet publish -c Release -o ./publish
 
       - name: Deploy to IIS
+        shell: pwsh
         run: |
           echo "Deploying to IIS..."
-          # optional: stop AppPool before deploy
+          Import-Module WebAdministration
+
+          # Stop AppPool
           Stop-WebAppPool -Name "DefaultAppPool"
-          Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet" -ErrorAction Ignore
-          Copy-Item -Recurse -Force "./publish/*" "C:\inetpub\wwwroot\dotnet"
-          # optional: start AppPool after deploy
+
+          # Ensure folder exists
+          if (Test-Path "C:\inetpub\wwwroot\dotnet") {
+              Remove-Item -Recurse -Force "C:\inetpub\wwwroot\dotnet"
+          }
+          New-Item -ItemType Directory -Path "C:\inetpub\wwwroot\dotnet" -Force
+
+          # Copy published files into IIS site folder
+          Copy-Item -Path "./publish/*" -Destination "C:\inetpub\wwwroot\dotnet\" -Recurse -Force
+
+          # Start AppPool
           Start-WebAppPool -Name "DefaultAppPool"
